@@ -3,7 +3,7 @@
 
 FilesModel::FilesModel(QObject *parent)
 {
-    getFilesAndFolders("C:/TestFilesFolder", 0);
+    getFilesAndFolders("C:/TestFilesFolder", 0, false);
 }
 
 QVariant FilesModel::data(const QModelIndex &index, int role) const
@@ -37,22 +37,14 @@ int FilesModel::rowCount(const QModelIndex &parent) const
     return  m_filesAndFolders.size();
 }
 
-void FilesModel::getFilesAndFolders(const QString &directory, const int &sort)
+void FilesModel::getFilesAndFolders(const QString &directory, const int &sort, const bool &reverse)
 {
     beginResetModel();
-    auto sortFlag = QDir::Unsorted;
-    switch (sort) {
-    case sortByName:
-        sortFlag = QDir::Name;
-    case sortByDate:
-        sortFlag = QDir::Time;
-    case sortBySize:
-        sortFlag = QDir::Size;
-    }
 
     FileRenamer files;
-    files.openFilesAndFolders(directory, sortFlag);
+    files.openFilesAndFolders(directory, files.getSortFlag(sort), reverse);
     m_filesAndFolders.clear();
+    m_filesAndFolders.append(FileParametrs{"..","",""});
     foreach(auto &e, files.m_filesAndFolders)
     {
 
@@ -66,4 +58,5 @@ void FilesModel::getFilesAndFolders(const QString &directory, const int &sort)
                                                fileSize});
     }
     endResetModel();
+    //emit dataChanged(createIndex(0, 0), createIndex(m_filesAndFolders.count() - 1, 2));
 }

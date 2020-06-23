@@ -19,16 +19,9 @@ class FilesModel : public QAbstractListModel
 
     enum filesModelRules
     {
-        nameRole = Qt::DisplayRole,
+        nameRole = 0,
         dateRole,
         sizeRole
-    };
-
-    enum sortFlags
-    {
-        sortByName = Qt::DisplayRole,
-        sortByDate,
-        sortBySize
     };
 
 public:
@@ -37,7 +30,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void getFilesAndFolders(const QString &directory, const int &sort);
+    Q_INVOKABLE void getFilesAndFolders(const QString &directory, const int &sort, const bool &reverse);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 private:

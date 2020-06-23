@@ -5,11 +5,13 @@ FileRenamer::FileRenamer(QObject *parent)
 {
 }
 
-void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag)
+void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag, const bool &reverse)
 {
     QDir::setCurrent(pathDirectory);
 
-    m_filesAndFolders = QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDot, sortFlag | QDir::DirsFirst);
+    m_filesAndFolders = reverse ?
+                QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDotAndDotDot, QDir::Reversed | sortFlag |  QDir::DirsFirst):
+                QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDotAndDotDot, sortFlag| QDir::DirsFirst);
 
 /*
     foreach(QFileInfo file, m_filesAndFolders)
@@ -19,12 +21,27 @@ void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::
 */
 }
 
-void FileRenamer::fileRename(const QString &newFileName)
+QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
 {
-    openFilesAndFolders(QDir::currentPath(), QDir::Name);
+    switch (sort)
+    {
+    case sortByName:
+        return QDir::Name;
+    case sortByDate:
+        return QDir::Time;
+    case sortBySize:
+        return QDir::Size;
+    default:
+        return QDir::Unsorted;
+    }
+}
+
+void FileRenamer::fileRename(const QString &newFileName, const int &sort, const bool &reverse)
+{
+    openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);
     qint64 i = 0;
     foreach(QFileInfo const file, m_filesAndFolders)
-    {;
+    {
         //qDebug() << QString("%1").arg(file.fileName());
         if(file.isFile())
         {

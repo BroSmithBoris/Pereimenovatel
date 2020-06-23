@@ -6,28 +6,37 @@ import QtQuick.Controls.Styles 1.4
 import FileRenamer 1.0
 import FilesModel 1.0
 
-Window {
+Window
+{
     id: root
     visible: true
     width: 640
     height: 480
     title: qsTr("Переименователь")
+    property int columnNumber: 0
+    property bool reverse: false
+    property bool crutch: false
 
-    FileRenamer {
+
+    FileRenamer
+    {
         id:renamer
     }
 
-    FilesModel {
+    FilesModel
+    {
         id:filesModel
     }
 
-    Item {
+    Item
+    {
         id: pontrolPanel
         anchors.right: parent.right
         width: parent.width/2
         height: parent.height
 
-        TextField {
+        TextField
+        {
             id: newNameTextField
             width: parent.width -10
             height: 25
@@ -38,24 +47,28 @@ Window {
             placeholderText: "Укажите новое имя файлов"
         }
 
-        Button {
+        Button
+        {
             id: renameButton
             width: newNameTextField.width
             height: newNameTextField.height
             anchors.top: newNameTextField.bottom
             anchors.horizontalCenter: newNameTextField.horizontalCenter
 
-            Text {
+            Text
+            {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Переименовать")
             }
 
-            onClicked: {
+            onClicked:
+            {
                 var newNameText = newNameTextField.text
-                if(newNameText.length > 0) {
-                    renamer.fileRename(newNameText)
-                    filesModel.getFilesAndFolders(".", 0)
+                if(newNameText.length > 0)
+                {
+                    renamer.fileRename(newNameText, columnNumber, reverse)
+                    filesModel.getFilesAndFolders(".", columnNumber, reverse)
                 }
             }
         }
@@ -63,31 +76,36 @@ Window {
 
     }
 
-    Item {
+    Item
+    {
         id: explorer
         anchors.left: parent.left
         width: parent.width/2
         height: parent.height
 
-        Button {
+        Button
+        {
             id: enterButton
             anchors.right: tableView.right
             anchors.bottom: tableView.top
             width: 25
             height: 25
 
-            Text {
+            Text
+            {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr(">")
             }
 
-            onClicked: {
-                filesModel.getFilesAndFolders(pathTextField.text, 0)
+            onClicked:
+            {
+                filesModel.getFilesAndFolders(pathTextField.text, columnNumber, reverse)
             }
         }
 
-        TextField {
+        TextField
+        {
             id: pathTextField
             width: tableView.width - enterButton.width
             height: 25
@@ -98,7 +116,8 @@ Window {
             text: renamer.getCurrentDirectory()
         }
 
-        TableView {
+        TableView
+        {
             id: tableView
             model: filesModel
             anchors.fill: parent
@@ -106,15 +125,18 @@ Window {
             anchors.margins: 10
             clip: true
 
-            TableViewColumn {
+            TableViewColumn
+            {
                 id: nameColumn
                 width: tableView.width / 3
                 title: "Имя"
                 role: "name"
 
-                delegate: Item {
+                delegate: Item
+                {
                     id: colomn
-                    Text {
+                    Text
+                    {
                         id: nameText
                         text: styleData.value
                         anchors.fill: parent
@@ -126,27 +148,31 @@ Window {
                         elide: Text.ElideRight
                     }
 
-                    MouseArea {
+                    MouseArea
+                    {
                         anchors.fill: parent
                         hoverEnabled: false
                         cursorShape: Qt.PointingHandCursor
 
-                        onDoubleClicked: {
-                            filesModel.getFilesAndFolders(nameText.text, 0)
+                        onDoubleClicked:
+                        {
+                            filesModel.getFilesAndFolders(nameText.text, columnNumber, reverse)
                             pathTextField.text = renamer.getCurrentDirectory()
                         }
                     }
                 }
             }
 
-            TableViewColumn {
+            TableViewColumn
+            {
                 id: dateColumn
                 width: tableView.width / 3
                 title: "Дата изменения"
                 role: "date"
             }
 
-            TableViewColumn {
+            TableViewColumn
+            {
                 id: sizeColumn
                 width: tableView.width - nameColumn.width - dateColumn.width
                 title: "Размер"
@@ -161,17 +187,68 @@ Window {
     //            textColor: "#000"
     //        }
 
-            itemDelegate: Item {
-                Text {
-                    id: itemText
-                    text: styleData.value
+            itemDelegate: tableItem
+            headerDelegate: tableHeader
+        }
+
+        Component
+        {
+            id: tableItem
+            Text
+            {
+                id: itemText
+                text: styleData.value
+                anchors.fill: parent
+                anchors.leftMargin: 3
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+                font.pixelSize: 14
+                color: "#292929"
+                elide: Text.ElideRight
+            }
+        }
+
+        Component
+        {
+            id: tableHeader
+
+            Rectangle
+            {
+                width: textHeader.text.length * 1.2
+                height: textHeader.font.pixelSize * 1.2
+                color: "#C4C4C4"
+
+                border
+                {
+                    width: 0.5
+
+                }
+
+                Text
+                {
+                    id: textHeader
                     anchors.fill: parent
-                    anchors.leftMargin: 3
                     verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignLeft
-                    font.pixelSize: 14
-                    color: "#292929"
+                    horizontalAlignment: Text.Center
+                    text: styleData.value
                     elide: Text.ElideRight
+                }
+                Connections
+                {
+                    target: styleData
+                    onPressedChanged:
+                    {
+                        if (styleData.pressed === true && !crutch)
+                        {
+                            console.debug(styleData.column)
+                            reverse = (columnNumber === styleData.column)? !reverse : reverse;
+
+                            columnNumber = styleData.column
+
+                            filesModel.getFilesAndFolders(".", columnNumber, reverse)
+                        }
+                        crutch = !crutch
+                    }
                 }
             }
         }

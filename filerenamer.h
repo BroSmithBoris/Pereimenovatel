@@ -11,14 +11,22 @@
 class FileRenamer : public QObject
 {
     Q_OBJECT
+
+    enum sortFlags
+    {
+        sortByName = Qt::DisplayRole,
+        sortByDate,
+        sortBySize
+    };
+
 public:
     FileRenamer(QObject *parent = 0);
 
     Q_INVOKABLE QString getCurrentDirectory();
-    Q_INVOKABLE void fileRename(const QString &newFileName);
+    Q_INVOKABLE void fileRename(const QString &newFileName, const int &sort, const bool &reverse);
 
-    void openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag);
-
+    void openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag, const bool &reverse);
+    QDir::SortFlag getSortFlag(const int &sort);
     QFileInfoList m_filesAndFolders;
 };
 
