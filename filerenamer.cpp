@@ -12,13 +12,6 @@ void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::
     m_filesAndFolders = reverse ?
                 QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDotAndDotDot, QDir::Reversed | sortFlag |  QDir::DirsFirst):
                 QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDotAndDotDot, sortFlag| QDir::DirsFirst);
-
-/*
-    foreach(QFileInfo file, m_filesAndFolders)
-    {
-        qDebug() << QString("%1").arg(file.fileName());
-    }
-*/
 }
 
 QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
@@ -39,15 +32,18 @@ QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
 void FileRenamer::fileRename(const QString &newFileName, const int &sort, const bool &reverse)
 {
     openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);
+    QStringList newFileNameSplit = QStringList(newFileName.split("%%%"));
+
+    if(newFileNameSplit.count() <= 1)
+        newFileNameSplit.append("");
+
     qint64 i = 0;
     foreach(QFileInfo const file, m_filesAndFolders)
     {
-        //qDebug() << QString("%1").arg(file.fileName());
         if(file.isFile())
         {
             ++i;
-            //qDebug() << file.fileName();
-            QString newName = newFileName + "_" + QString().setNum(i) + "." + file.suffix();
+            QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
             qDebug() << newName;
             QFile::rename(file.fileName(), newName);
         }
