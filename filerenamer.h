@@ -16,8 +16,8 @@ class FileRenamer : public QObject
     {
         sortByName = Qt::DisplayRole,
         sortByDate,
-        sortBySize,
-        sortByType
+        sortByType,
+        sortBySize
     };
 
 public:

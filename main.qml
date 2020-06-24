@@ -74,6 +74,7 @@ Window
                     renamer.fileRename(newNameText, columnNumber, reverse, selectedRows, tableView.selection.count)
                     filesModel.getFilesAndFolders(".", columnNumber, reverse)
                 }
+                tableView.selection.clear()
             }
         }
 
