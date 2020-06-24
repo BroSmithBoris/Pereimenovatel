@@ -49,7 +49,7 @@ void FilesModel::getFilesAndFolders(const QString &directory, const int &sort, c
     FileRenamer files;
     files.openFilesAndFolders(directory, files.getSortFlag(sort), reverse);
     m_filesAndFolders.clear();
-    m_filesAndFolders.append(FileParametrs{"..","",""});
+    m_filesAndFolders.append(FileParametrs{"..","","",""});
     foreach(auto &e, files.m_filesAndFolders)
     {
         if(e.isFile())
