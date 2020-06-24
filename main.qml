@@ -10,12 +10,12 @@ Window
 {
     id: root
     visible: true
-    height: 480
+    width: 480
+    height: 640
     title: qsTr("Переименователь")
     property int columnNumber: 0
     property bool reverse: false
     property bool crutch: false
-
 
     FileRenamer
     {
@@ -27,23 +27,22 @@ Window
         id:filesModel
     }
 
-    Item
-    {
-        id: pontrolPanel
-        anchors.right: parent.right
-        width: parent.width/2
-        height: parent.height
+
+    Item {
+
+        anchors.fill: parent
+        anchors.margins: 10
 
         TextField
         {
             id: newNameTextField
-            width: parent.width -10
+            width: parent.width
             height: 25
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 10
             verticalAlignment: TextEdit.AlignVCenter
-            placeholderText: "Укажите новое имя файлов"
+            placeholderText: "Укажите новое имя файлов, где %%% маска для числа порядка"
         }
 
         Button
@@ -52,7 +51,7 @@ Window
             width: newNameTextField.width
             height: newNameTextField.height
             anchors.top: newNameTextField.bottom
-            anchors.horizontalCenter: newNameTextField.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
 
             Text
             {
@@ -72,56 +71,49 @@ Window
             }
         }
 
-
-    }
-
-    Item
-    {
-        id: explorer
-        anchors.left: parent.left
-        width: parent.width/2
-        height: parent.height
-
-        Button
-        {
-            id: enterButton
-            anchors.right: tableView.right
-            anchors.bottom: tableView.top
-            width: 25
-            height: 25
-
-            Text
-            {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr(">")
-            }
-
-            onClicked:
-            {
-                filesModel.getFilesAndFolders(pathTextField.text, columnNumber, reverse)
-            }
-        }
-
         TextField
         {
             id: pathTextField
-            width: tableView.width - enterButton.width
+            width: parent.width - enterButton.width
             height: 25
-            anchors.left: tableView.left
-            anchors.bottom: tableView.top
+            anchors.top: renameButton.bottom
+            anchors.topMargin: 10
+            anchors.left: renameButton.left
             verticalAlignment: TextEdit.AlignVCenter
             placeholderText: "Укажите путь"
             text: renamer.getCurrentDirectory()
+
+            Button
+            {
+                id: enterButton
+                anchors.left: parent.right
+                //anchors.verticalCenter: parent.verticalCenter
+                width: 25
+                height: 25
+
+                Text
+                {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr(">")
+                }
+
+                onClicked:
+                {
+                    filesModel.getFilesAndFolders(pathTextField.text, columnNumber, reverse)
+                }
+            }
         }
 
         TableView
         {
             id: tableView
             model: filesModel
-            anchors.fill: parent
-            anchors.topMargin: enterButton.height + 10
-            anchors.margins: 10
+            width: parent.width
+            anchors.top: pathTextField.bottom
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            //anchors.margins: 10
             clip: true
 
             TableViewColumn
@@ -188,65 +180,65 @@ Window
 
             itemDelegate: tableItem
             headerDelegate: tableHeader
-        }
 
-        Component
-        {
-            id: tableItem
-            Text
+            Component
             {
-                id: itemText
-                text: styleData.value
-                anchors.fill: parent
-                anchors.leftMargin: 3
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                font.pixelSize: 14
-                color: "#292929"
-                elide: Text.ElideRight
-            }
-        }
-
-        Component
-        {
-            id: tableHeader
-
-            Rectangle
-            {
-                width: textHeader.text.length * 1.2
-                height: textHeader.font.pixelSize * 1.2
-                color: "#C4C4C4"
-
-                border
-                {
-                    width: 0.5
-
-                }
-
+                id: tableItem
                 Text
                 {
-                    id: textHeader
-                    anchors.fill: parent
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.Center
+                    id: itemText
                     text: styleData.value
+                    anchors.fill: parent
+                    anchors.leftMargin: 3
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignLeft
+                    font.pixelSize: 14
+                    color: "#292929"
                     elide: Text.ElideRight
                 }
-                Connections
+            }
+
+            Component
+            {
+                id: tableHeader
+
+                Rectangle
                 {
-                    target: styleData
-                    onPressedChanged:
+                    width: textHeader.text.length * 1.2
+                    height: textHeader.font.pixelSize * 1.2
+                    color: "#C4C4C4"
+
+                    border
                     {
-                        if (styleData.pressed === true && !crutch)
+                        width: 1
+                        color: "#808080"
+                    }
+
+                    Text
+                    {
+                        id: textHeader
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.Center
+                        text: styleData.value
+                        elide: Text.ElideRight
+                    }
+                    Connections
+                    {
+                        target: styleData
+                        onPressedChanged:
                         {
-                            console.debug(styleData.column)
-                            reverse = (columnNumber === styleData.column)? !reverse : reverse;
+                            if (styleData.pressed === true && !crutch)
+                            {
+                                console.debug(styleData.column)
+                                reverse = (columnNumber === styleData.column)? !reverse : reverse;
 
-                            columnNumber = styleData.column
+                                columnNumber = styleData.column
 
-                            filesModel.getFilesAndFolders(".", columnNumber, reverse)
+                                filesModel.getFilesAndFolders(".", columnNumber, reverse)
+                            }
+                            crutch = !crutch
                         }
-                        crutch = !crutch
                     }
                 }
             }
