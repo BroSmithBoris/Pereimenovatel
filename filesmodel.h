@@ -10,6 +10,7 @@ struct FileParametrs
 {
     QString fileName;
     QString fileDateCreate;
+    QString fileType;
     QString fileSize;
 };
 
@@ -21,6 +22,7 @@ class FilesModel : public QAbstractListModel
     {
         nameRole = 0,
         dateRole,
+        typeRole,
         sizeRole
     };
 

@@ -16,14 +16,15 @@ class FileRenamer : public QObject
     {
         sortByName = Qt::DisplayRole,
         sortByDate,
-        sortBySize
+        sortBySize,
+        sortByType
     };
 
 public:
     FileRenamer(QObject *parent = 0);
 
     Q_INVOKABLE QString getCurrentDirectory();
-    Q_INVOKABLE void fileRename(const QString &newFileName, const int &sort, const bool &reverse);
+    Q_INVOKABLE void fileRename(const QString &newFileName, const int &sort, const bool &reverse, const QJSValue &selectedRows, const int &selectedRowscount);
 
     void openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag, const bool &reverse);
     QDir::SortFlag getSortFlag(const int &sort);

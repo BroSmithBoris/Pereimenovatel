@@ -22,6 +22,8 @@ QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
         return QDir::Name;
     case sortByDate:
         return QDir::Time;
+    case sortByType:
+        return QDir::Type;
     case sortBySize:
         return QDir::Size;
     default:
@@ -29,22 +31,44 @@ QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
     }
 }
 
-void FileRenamer::fileRename(const QString &newFileName, const int &sort, const bool &reverse)
+void FileRenamer::fileRename(const QString &newFileName, const int &sort, const bool &reverse, const QJSValue &selectedRows, const int &selectedRowscount)
 {
-    openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);
-    QStringList newFileNameSplit = QStringList(newFileName.split("%%%"));
+    QList<qint32> indexList = {};
+    for(int e = 0; e < selectedRowscount; e++)
+        indexList.append(selectedRows.property(e).toInt());
+    indexList.removeOne(0);
 
+    QStringList newFileNameSplit = QStringList(newFileName.split("%%%"));
     if(newFileNameSplit.count() <= 1)
         newFileNameSplit.append("");
 
-    qint64 i = 0;
-    foreach(QFileInfo const file, m_filesAndFolders)
+    openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);
+
+    int i = 0;
+
+    if(indexList.count() >= 1)
     {
-        if(file.isFile())
+        foreach(int index, indexList)
         {
-            ++i;
-            QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
-            QFile::rename(file.fileName(), newName);
+            QFileInfo file = m_filesAndFolders[index - 1];
+            if(file.isFile())
+            {
+                ++i;
+                QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
+                QFile::rename(file.fileName(), newName);
+            }
+        }
+    }
+    else
+    {
+        foreach(QFileInfo const file, m_filesAndFolders)
+        {
+            if(file.isFile())
+            {
+                ++i;
+                QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
+                QFile::rename(file.fileName(), newName);
+            }
         }
     }
 }

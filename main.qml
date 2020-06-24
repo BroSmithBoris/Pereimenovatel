@@ -69,7 +69,9 @@ Window
                 var newNameText = newNameTextField.text
                 if(newNameText.length > 0)
                 {
-                    renamer.fileRename(newNameText, columnNumber, reverse)
+                    var selectedRows = []
+                    tableView.selection.forEach(function(rowIndex) {selectedRows.push(rowIndex)} )
+                    renamer.fileRename(newNameText, columnNumber, reverse, selectedRows, tableView.selection.count)
                     filesModel.getFilesAndFolders(".", columnNumber, reverse)
                 }
             }
@@ -122,7 +124,7 @@ Window
             TableViewColumn
             {
                 id: nameColumn
-                width: tableView.width / 3
+                width: tableView.width / 4
                 title: "Имя"
                 role: "name"
 
@@ -137,7 +139,7 @@ Window
                         anchors.leftMargin: 3
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignLeft
-                        font.pixelSize: 14
+                        font.pixelSize: 17
                         color: "#292929"
                         elide: Text.ElideRight
                     }
@@ -154,7 +156,6 @@ Window
                             {
                                 filesModel.getFilesAndFolders(nameText.text, columnNumber, reverse)
                                 pathTextField.text = renamer.getCurrentDirectory()
-                                console.log("a")
                                 rowNumber = 0
                             }
                             else
@@ -169,15 +170,23 @@ Window
             TableViewColumn
             {
                 id: dateColumn
-                width: tableView.width / 3
+                width: tableView.width / 4
                 title: "Дата изменения"
                 role: "date"
             }
 
             TableViewColumn
             {
+                id: typeColumn
+                width: tableView.width / 4
+                title: "Тип"
+                role: "type"
+            }
+
+            TableViewColumn
+            {
                 id: sizeColumn
-                width: tableView.width - nameColumn.width - dateColumn.width
+                width: tableView.width - nameColumn.width - dateColumn.width - typeColumn.width
                 title: "Размер"
                 role: "size"
                 resizable: false;
@@ -189,7 +198,6 @@ Window
             Component
             {
                 id: tableItem
-
                 Text
                 {
                     id: itemText
@@ -198,7 +206,7 @@ Window
                     anchors.leftMargin: 3
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignLeft
-                    font.pixelSize: 14
+                    font.pixelSize: 17
                     color: "#292929"
                     elide: Text.ElideRight
                 }
@@ -227,6 +235,7 @@ Window
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.Center
                         text: styleData.value
+                        font.pixelSize: 15
                         elide: Text.ElideRight
                     }
 

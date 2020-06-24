@@ -18,6 +18,8 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
         return m_filesAndFolders[index.row()].fileName;
     case dateRole:
         return m_filesAndFolders[index.row()].fileDateCreate;
+    case typeRole:
+        return m_filesAndFolders[index.row()].fileType;
     case sizeRole:
         return m_filesAndFolders[index.row()].fileSize;
     default:
@@ -30,6 +32,7 @@ QHash<int, QByteArray> FilesModel::roleNames() const
     QHash<int, QByteArray> roleNames;
     roleNames[nameRole] = "name";
     roleNames[dateRole] = "date";
+    roleNames[typeRole] = "type";
     roleNames[sizeRole] = "size";
     return  roleNames;
 }
@@ -49,15 +52,23 @@ void FilesModel::getFilesAndFolders(const QString &directory, const int &sort, c
     m_filesAndFolders.append(FileParametrs{"..","",""});
     foreach(auto &e, files.m_filesAndFolders)
     {
-
-        qint64 i = 0;
-        QStringList sizeType = { "Б", "КБ", "МБ", "ГБ", "ТБ" };
-        qint64 nSize = e.size();
-        for (; nSize > 1023; nSize /= 1024, ++i) { }
-        QString fileSize = QString().setNum(nSize) + " " + sizeType[i];
-        m_filesAndFolders.append(FileParametrs{e.fileName(),
-                                               e.fileTime(QFileDevice::FileModificationTime).toString("dd.MM.yyyy hh:mm"),
-                                               fileSize});
+        if(e.isFile())
+        {
+            qint64 i = 0;
+            QStringList sizeType = { "Б", "КБ", "МБ", "ГБ", "ТБ" };
+            qint64 nSize = e.size();
+            for (; nSize > 1023; nSize /= 1024, ++i) { }
+            QString fileSize = QString().setNum(nSize) + " " + sizeType[i];
+            m_filesAndFolders.append(FileParametrs{e.fileName(),
+                                                   e.fileTime(QFileDevice::FileModificationTime).toString("dd.MM.yyyy hh:mm"),
+                                                   e.suffix(),
+                                                   fileSize});
+        }
+        else
+            m_filesAndFolders.append(FileParametrs{e.fileName(),
+                                                   e.fileTime(QFileDevice::FileModificationTime).toString("dd.MM.yyyy hh:mm"),
+                                                   "",
+                                                   ""});
     }
     endResetModel();
 }
