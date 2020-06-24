@@ -2,10 +2,6 @@ QT += quick
 
 VERSION = 1.0.0
 
-QMAKE_TARGET_COMPANY = BorisSmith
-QMAKE_TARGET_PRODUCT = Pereimenovatel
-QMAKE_TARGET_COPYRIGHT = Boris Kuznetsov
-
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use

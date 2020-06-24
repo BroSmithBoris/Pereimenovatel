@@ -14,6 +14,8 @@ Window
     height: 640
     title: qsTr("Переименователь")
     property int columnNumber: 0
+    property int rowNumber: 0
+
     property bool reverse: false
     property bool clickCheck: false
 
@@ -37,12 +39,13 @@ Window
         {
             id: newNameTextField
             width: parent.width
-            height: 25
+            height: 40
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: 10
             verticalAlignment: TextEdit.AlignVCenter
             placeholderText: "Укажите новое имя файлов, где %%% маска для порядка"
+            font.pixelSize: 16
         }
 
         Button
@@ -58,6 +61,7 @@ Window
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Переименовать")
+                font.pixelSize: 16
             }
 
             onClicked:
@@ -82,12 +86,11 @@ Window
             verticalAlignment: TextEdit.AlignVCenter
             placeholderText: "Укажите путь"
             text: renamer.getCurrentDirectory()
-
+            font.pixelSize: 16
             Button
             {
                 id: enterButton
                 anchors.left: parent.right
-                //anchors.verticalCenter: parent.verticalCenter
                 width: 25
                 height: 25
 
@@ -113,8 +116,8 @@ Window
             anchors.top: pathTextField.bottom
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
-            //anchors.margins: 10
             clip: true
+            selectionMode: SelectionMode.ExtendedSelection
 
             TableViewColumn
             {
@@ -144,11 +147,20 @@ Window
                         anchors.fill: parent
                         hoverEnabled: false
                         cursorShape: Qt.PointingHandCursor
-
-                        onDoubleClicked:
+                        propagateComposedEvents: true
+                        onPressed:
                         {
-                            filesModel.getFilesAndFolders(nameText.text, columnNumber, reverse)
-                            pathTextField.text = renamer.getCurrentDirectory()
+                            if(rowNumber === styleData.row)
+                            {
+                                filesModel.getFilesAndFolders(nameText.text, columnNumber, reverse)
+                                pathTextField.text = renamer.getCurrentDirectory()
+                                console.log("a")
+                                rowNumber = 0
+                            }
+                            else
+                                rowNumber = styleData.row
+                            mouse.accepted = false
+
                         }
                     }
                 }
@@ -171,19 +183,13 @@ Window
                 resizable: false;
             }
 
-    //        style: TableViewStyle{
-    //            id: tableStyle
-    //            backgroundColor: "#DEDEDE"
-    //            alternateBackgroundColor: "#C4C4C4"
-    //            textColor: "#000"
-    //        }
-
             itemDelegate: tableItem
             headerDelegate: tableHeader
 
             Component
             {
                 id: tableItem
+
                 Text
                 {
                     id: itemText

@@ -15,11 +15,13 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case nameRole:
-        return  m_filesAndFolders[index.row()].fileName;
+        return m_filesAndFolders[index.row()].fileName;
     case dateRole:
         return m_filesAndFolders[index.row()].fileDateCreate;
     case sizeRole:
         return m_filesAndFolders[index.row()].fileSize;
+    default:
+        return m_filesAndFolders[index.row()].fileName;
     }
 }
 
@@ -58,5 +60,4 @@ void FilesModel::getFilesAndFolders(const QString &directory, const int &sort, c
                                                fileSize});
     }
     endResetModel();
-    //emit dataChanged(createIndex(0, 0), createIndex(m_filesAndFolders.count() - 1, 2));
 }

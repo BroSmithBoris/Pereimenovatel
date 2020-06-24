@@ -44,7 +44,6 @@ void FileRenamer::fileRename(const QString &newFileName, const int &sort, const 
         {
             ++i;
             QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
-            qDebug() << newName;
             QFile::rename(file.fileName(), newName);
         }
     }
