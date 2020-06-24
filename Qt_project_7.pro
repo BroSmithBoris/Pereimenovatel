@@ -1,5 +1,11 @@
 QT += quick
 
+VERSION = 1.0.0
+
+QMAKE_TARGET_COMPANY = BorisSmith
+QMAKE_TARGET_PRODUCT = Pereimenovatel
+QMAKE_TARGET_COPYRIGHT = Boris Kuznetsov
+
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -19,7 +25,8 @@ SOURCES += \
         main.cpp
 
 RESOURCES += qml.qrc
-
+RC_FILE += appIcon.rc
+OTHER_FILES += appIcon.rc
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -34,3 +41,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     filerenamer.h \
     filesmodel.h
+
+DISTFILES += \
+    icon.ico

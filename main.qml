@@ -15,7 +15,7 @@ Window
     title: qsTr("Переименователь")
     property int columnNumber: 0
     property bool reverse: false
-    property bool crutch: false
+    property bool clickCheck: false
 
     FileRenamer
     {
@@ -42,7 +42,7 @@ Window
             anchors.top: parent.top
             anchors.topMargin: 10
             verticalAlignment: TextEdit.AlignVCenter
-            placeholderText: "Укажите новое имя файлов, где %%% маска для числа порядка"
+            placeholderText: "Укажите новое имя файлов, где %%% маска для порядка"
         }
 
         Button
@@ -223,21 +223,19 @@ Window
                         text: styleData.value
                         elide: Text.ElideRight
                     }
+
                     Connections
                     {
                         target: styleData
                         onPressedChanged:
                         {
-                            if (styleData.pressed === true && !crutch)
+                            if (styleData.pressed === true && !clickCheck)
                             {
-                                console.debug(styleData.column)
                                 reverse = (columnNumber === styleData.column)? !reverse : reverse;
-
                                 columnNumber = styleData.column
-
                                 filesModel.getFilesAndFolders(".", columnNumber, reverse)
                             }
-                            crutch = !crutch
+                            clickCheck = !clickCheck
                         }
                     }
                 }
