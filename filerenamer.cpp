@@ -53,8 +53,6 @@ void FileRenamer::fileRename(const QString &newFileName, const int &sort, const 
 
     openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);   //Получение файлов и каталогов в пути
 
-    qDebug() << indexList;
-
     int i = 0;  //Номер порядка
     if(indexList.count() >= 1)  //Проверка на наличие определённых индексов для переименования
         foreach(int index, indexList)
