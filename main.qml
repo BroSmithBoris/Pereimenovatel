@@ -187,10 +187,9 @@ Window
             TableViewColumn
             {
                 id: sizeColumn
-                width: tableView.width - nameColumn.width - dateColumn.width - typeColumn.width
+                width: tableView.width / 4
                 title: "Размер"
                 role: "size"
-                resizable: false;
             }
 
             itemDelegate: tableItem
