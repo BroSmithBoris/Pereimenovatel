@@ -1,11 +1,13 @@
 #include "filesmodel.h"
 #include "filerenamer.h"
 
+//Начальная директория
 FilesModel::FilesModel(QObject *parent)
 {
-    getFilesAndFolders("C:/TestFilesFolder", 0, false);
+    getFilesAndFolders("C:/", 0, false);
 }
 
+//Модель
 QVariant FilesModel::data(const QModelIndex &index, int role) const
 {
     if(index.row() < 0 || index.row() > m_filesAndFolders.size())
@@ -27,6 +29,7 @@ QVariant FilesModel::data(const QModelIndex &index, int role) const
     }
 }
 
+//Правила модели
 QHash<int, QByteArray> FilesModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames;
@@ -37,20 +40,22 @@ QHash<int, QByteArray> FilesModel::roleNames() const
     return  roleNames;
 }
 
+//Число строк
 int FilesModel::rowCount(const QModelIndex &parent) const
 {
     return  m_filesAndFolders.size();
 }
 
+//Получение и обработка файлов и каталогов по пути
 void FilesModel::getFilesAndFolders(const QString &directory, const int &sort, const bool &reverse)
 {
     beginResetModel();
 
     FileRenamer files;
-    files.openFilesAndFolders(directory, files.getSortFlag(sort), reverse);
-    m_filesAndFolders.clear();
-    m_filesAndFolders.append(FileParametrs{"..","","",""});
-    foreach(auto &e, files.m_filesAndFolders)
+    files.openFilesAndFolders(directory, files.getSortFlag(sort), reverse);    //Получение файлов и каталогов в пути
+    m_filesAndFolders.clear();    //Очистка списка файлов и каталогов
+    m_filesAndFolders.append(FileParametrs{"..","","",""});    //Добавление строки перехода назад
+    foreach(auto &e, files.m_filesAndFolders)    //Обработка каждого файла и каталога
     {
         if(e.isFile())
         {

@@ -107,6 +107,7 @@ Window
                 onClicked:
                 {
                     filesModel.getFilesAndFolders(pathTextField.text, columnNumber, reverse)
+                    tableView.selection.clear()
                 }
             }
         }
@@ -162,7 +163,6 @@ Window
                             else
                                 rowNumber = styleData.row
                             mouse.accepted = false
-
                         }
                     }
                 }

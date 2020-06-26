@@ -27,6 +27,8 @@ public:
     Q_INVOKABLE void fileRename(const QString &newFileName, const int &sort, const bool &reverse, const QJSValue &selectedRows, const int &selectedRowscount);
 
     void openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag, const bool &reverse);
+    int rename(const QFileInfo &file, const QStringList &newFileNameSplit, int index);
+
     QDir::SortFlag getSortFlag(const int &sort);
     QFileInfoList m_filesAndFolders;
 };

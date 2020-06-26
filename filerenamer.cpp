@@ -5,6 +5,7 @@ FileRenamer::FileRenamer(QObject *parent)
 {
 }
 
+//Получение файлов и каталогов в пути
 void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::SortFlag &sortFlag, const bool &reverse)
 {
     QDir::setCurrent(pathDirectory);
@@ -14,6 +15,7 @@ void FileRenamer::openFilesAndFolders(const QString &pathDirectory, const QDir::
                 QDir::current().entryInfoList(QStringList(), QDir::AllEntries | QDir::NoDotAndDotDot, sortFlag| QDir::DirsFirst);
 }
 
+//Получение флага сортировки
 QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
 {
     switch (sort)
@@ -31,49 +33,56 @@ QDir::SortFlag FileRenamer::getSortFlag(const int &sort)
     }
 }
 
+//Переименование файлов
 void FileRenamer::fileRename(const QString &newFileName, const int &sort, const bool &reverse, const QJSValue &selectedRows, const int &selectedRowscount)
 {
-    QList<qint32> indexList = {};
-    for(int e = 0; e < selectedRowscount; e++)
+    QList<qint32> indexList = {};    //Список индексов выделенных строк
+    QList<QChar> forbiddenSymbols = {'/','\\','|','?','*','"','>','<',':'};    //Список некорректных символов
+
+    foreach(QChar symbols, forbiddenSymbols)    //Проверка строки нового названия на валидность
+        if(newFileName.contains(symbols))
+            return;
+
+    for(int e = 0; e < selectedRowscount; e++)  //Заполнение списка индексами
         indexList.append(selectedRows.property(e).toInt());
     indexList.removeOne(0);
 
-    QStringList newFileNameSplit = QStringList(newFileName.split("%%%"));
+    QStringList newFileNameSplit = QStringList(newFileName.split("%%%"));   //Разделение строки нового названия на части
     if(newFileNameSplit.count() <= 1)
         newFileNameSplit.append("");
 
-    openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);
+    openFilesAndFolders(QDir::currentPath(), getSortFlag(sort), reverse);   //Получение файлов и каталогов в пути
 
-    int i = 0;
+    qDebug() << indexList;
 
-    if(indexList.count() >= 1)
-    {
+    int i = 0;  //Номер порядка
+    if(indexList.count() >= 1)  //Проверка на наличие определённых индексов для переименования
         foreach(int index, indexList)
         {
+
             QFileInfo file = m_filesAndFolders[index - 1];
-            if(file.isFile())
-            {
-                ++i;
-                QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
-                QFile::rename(file.fileName(), newName);
-            }
+            i = rename(file, newFileNameSplit, i);
         }
-    }
     else
-    {
         foreach(QFileInfo const file, m_filesAndFolders)
-        {
-            if(file.isFile())
-            {
-                ++i;
-                QString newName = newFileNameSplit[0] + QString().setNum(i) + newFileNameSplit[1] + "." + file.suffix();
-                QFile::rename(file.fileName(), newName);
-            }
-        }
-    }
+            i = rename(file, newFileNameSplit, i);
 }
 
+//Получение пути
 QString FileRenamer::getCurrentDirectory()
 {
     return QDir::currentPath();
+}
+
+//Переименование файла
+int FileRenamer::rename(const QFileInfo &file, const QStringList &newFileNameSplit, int index)
+{
+    if(file.isFile())    //Проверка файл ли
+    {
+        ++index;
+        QString newName = newFileNameSplit[0] + QString().setNum(index) + newFileNameSplit[1] + "." + file.suffix();
+        QFile::rename(file.fileName(), newName);
+    }
+
+    return index;
 }
